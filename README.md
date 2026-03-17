@@ -4,10 +4,13 @@ Bu proje, Spring Boot kullanarak bir bildirim mikroservisi sağlar. Servis Rabbi
 
 ## Mimari
 
-- `NotificationController` REST API uç noktalarını sunar.
-- `NotificationService` arayüzü, iş mantığı metotlarını tanımlar.
-- `NotificationServiceImpl` sınıfı RabbitMQ üzerinden e-posta mesajı kuyruğuna gönderir.
-- Mimari, SMS ve sesli çağrı (voice call) bildirim adaptörlerini eklemeye uygun olacak şekilde planlanmıştır (uygulama katmanında `NotificationType` ve `NotificationFactory` genişletilebilir).
+![Mimari Diyagram](architecture.png)
+
+1. **REST API** gelen isteği karşılar ve Producer'ı tetikler.
+2. **Producer (API / Servis)** mesajı RabbitMQ Direct Exchange'e iletir.
+3. **Consumer (Spring Listener)** mesajı queue'dan alır ve DB'ye `PENDING` statüsüyle kaydeder.
+4. **Mail gönderimi** gerçekleştirilir (SMTP / SES).
+5. Gönderim başarılıysa DB `SENT`, başarısızsa `FAILED` olarak güncellenir (`sent_at` veya `error` alanıyla birlikte).
 
 ## Kullanılan Teknolojiler
 
